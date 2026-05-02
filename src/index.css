@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Inter", "Helvetica Neue", Arial, sans-serif;
+  
+  --color-sage: #94a684;
+  --color-dark-bg: #0d0f11;
+  --color-dark-card: #161a1d;
+  --color-dark-accent: #1e2328;
+  --color-border-subtle: rgba(255, 255, 255, 0.04);
+}
+
+body {
+  background-color: var(--color-dark-bg);
+  color: #f1f3f5;
+  @apply font-sans antialiased;
+}
+
+.card {
+  @apply bg-dark-card border border-border-subtle rounded-[28px] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300;
+}
+
+.glass-panel {
+  @apply bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-[28px];
+}
+
+.sidebar-icon {
+  @apply w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300;
+}
+
+.sidebar-icon.active {
+  @apply bg-sage text-white shadow-lg shadow-sage/20 scale-105;
+}
+
+.sidebar-icon.inactive {
+  @apply text-gray-500 hover:text-gray-300 hover:bg-white/5;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full;
+}
