@@ -25,8 +25,87 @@ import {
   Shapes,
   Brain,
   Target,
-  BookOpen
+  BookOpen,
+  Share,
+  X
 } from 'lucide-react';
+
+// --- PWA Install Prompt Component ---
+
+const PWAInstallPrompt = () => {
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [platform, setPlatform] = useState<'ios' | 'other'>('other');
+
+  useEffect(() => {
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    
+    if (isIOS) {
+      setPlatform('ios');
+      // Show prompt after a short delay
+      const timer = setTimeout(() => setShowPrompt(true), 3000);
+      return () => clearTimeout(timer);
+    }
+
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      // For Android/Chrome we could save the event and show a button
+      // But for now, let's keep it simple and consistent
+      setShowPrompt(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  if (!showPrompt) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div 
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 100, opacity: 0 }}
+        className="fixed bottom-24 left-6 right-6 z-50 lg:hidden"
+      >
+        <div className="bg-dark-card border border-sage/30 rounded-[32px] p-6 shadow-2xl shadow-black/50 backdrop-blur-xl">
+          <button 
+            onClick={() => setShowPrompt(false)}
+            className="absolute top-4 right-4 text-gray-500 hover:text-white"
+          >
+            <X size={20} />
+          </button>
+          
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 bg-sage rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <Sparkles size={24} />
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-lg">Установи Lumina</h3>
+              <p className="text-xs text-gray-500 font-medium">Добавь на главный экран для быстрого доступа</p>
+            </div>
+          </div>
+
+          <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+            {platform === 'ios' ? (
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Нажми <Share size={16} className="inline mx-1 text-sage" /> в меню Safari и выбери <span className="text-white font-bold">«На экран "Домой"»</span>
+              </p>
+            ) : (
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Нажми на три точки в углу браузера и выбери <span className="text-white font-bold">«Установить приложение»</span>
+              </p>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
 import { Subject, Task, Message, View, UserProfile } from './types';
 import { SUBJECT_CONFIG, MOTIVATIONAL_QUOTES, UPDATED_SCHEDULE } from './constants';
 import { chatWithLumina, getSchoolTips } from './services/gemini';
@@ -1084,6 +1163,7 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen selection:bg-sage/10">
+      <PWAInstallPrompt />
       {/* Sidebar Navigation - Narrow sage sidebar */}
       <aside className="w-24 bg-sage hidden lg:flex flex-col items-center py-10 fixed h-full z-30 shadow-2xl">
         <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-sage shadow-lg mb-12 rotate-45">
